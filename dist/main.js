@@ -1,0 +1,1 @@
+(()=>{"use strict";const t=function(t){let e=0;return{length:4,hits:e,getHits:()=>e,increaseHit:()=>e++,isSunk:()=>e>=4}}();t.increaseHit(),t.increaseHit(),console.log(t.getHits())})();
