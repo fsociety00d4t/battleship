@@ -1,11 +1,11 @@
 import { ship } from "./ship";
 
-let occupiedCoords = [];
-let cells = [];
-let missed = [];
-let hit = [];
-
 function gameBoard() {
+  let occupiedCoords = [];
+  let cells = [];
+  let missed = [];
+  let hit = [];
+
   const place = (ship, x, y) => {
     if (ship.direction === "horizontal") {
       for (let i = 0; i < ship.length; i++) {
@@ -39,10 +39,12 @@ function gameBoard() {
       if (hit.find((e, i) => e[0] === x && e[1] === y) === undefined) {
         test[0].increaseHit();
         hit.push([x, y]);
+        return true;
       }
     } else {
       if (missed.find((e, i) => e[0] === x && e[1] === y) === undefined)
         missed.push([x, y]);
+      return false;
     }
   };
 
