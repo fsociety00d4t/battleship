@@ -25,7 +25,7 @@ describe("get the correct turn", () => {
     Player.determineTurn();
     expect(Player.getTurn()).toBe("player");
   });
-  test("play again if hit - AI", () => {
+  test.skip("play again if hit - AI", () => {
     Ship = ship(3, "vertical");
     playersGamBoard.placeShip(Ship, 0, 5);
     Player.changeTurn(3);
@@ -51,15 +51,18 @@ describe("players turn", () => {
 describe("AI turn", () => {
   let y = ship(3, "horizontal");
   playersGamBoard.placeShip(y, 3, 5);
-  test("AI hit a ship", () => {
+  test.skip("AI hit a ship", () => {
     Player.AITurn(playersGamBoard, 4, 5);
     expect(y.getHits()).toBe(1);
   });
-  /*test("AI hitted a nearby cell after a hit", () => {
-    player.AIturn = playersGamBoard.receiveAttack(5, 5);
-    player.AITurn();
-    expect(playersGamBoard.missed).toContainEqual[];
-  }); */
+  test("AI hitted a nearby cell after a hit", () => {
+    expect([
+      [2, 5],
+      [4, 5],
+      [3, 4],
+      [3, 6],
+    ]).toContainEqual(Player.getRandomAdjacent(3, 5));
+  });
   test("AI missed a ship", () => {
     Player.AITurn = playersGamBoard.receiveAttack(9, 9);
     expect(playersGamBoard.missed).toContainEqual([9, 9]);

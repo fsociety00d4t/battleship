@@ -20,12 +20,31 @@ function gameBoard() {
     }
   };
 
-  const isValid = (x, y) => {
-    return !cells.some((e, i) => e[0] === x && e[1] === y);
+  const isValid = (ship, x, y) => {
+    let arr = [];
+    let flag = false;
+    for (let i = 0; i < ship.length; i++) {
+      if (ship.direction === "horizontal") arr.push([x + i, y]);
+      else arr.push([x, y + i]);
+    }
+
+    arr.forEach((el) => {
+      if (cells.some((e, i) => e[0] === el[0] && e[1] === el[1])) flag = true;
+    });
+
+    console.log(flag);
+    return (
+      flag === false &&
+      (ship.direction === "horizontal"
+        ? x + ship.length - 1 < 10
+        : y + ship.length - 1 < 10)
+    );
   };
 
   const placeShip = (ship, x, y) => {
-    if (isValid(x, y)) {
+    console.log(`from board ${x} ${y}`);
+    if (isValid(ship, x, y)) {
+      console.log("valid");
       place(ship, x, y);
       return true;
     } else {
@@ -50,7 +69,19 @@ function gameBoard() {
 
   const areAllSunk = () => occupiedCoords.length === hit.length;
 
-  return { placeShip, receiveAttack, missed, areAllSunk, occupiedCoords };
+  const getCells = () => {
+    return cells;
+  };
+
+  return {
+    placeShip,
+    receiveAttack,
+    missed,
+    areAllSunk,
+    occupiedCoords,
+    cells,
+    getCells,
+  };
 }
 
 export { gameBoard };

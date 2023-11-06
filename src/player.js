@@ -40,7 +40,7 @@ function player() {
 
     return options[Math.floor(Math.random() * options.length)];
   };
-  const AITurn = (board, x, y) => {
+  const AITurn = (board) => {
     // let v = board.receiveAttack(x, y);
     // if (!v) turnCount++;
     let values = getRandomCell();
@@ -60,6 +60,7 @@ function player() {
     changeTurn,
     playerTurn,
     AITurn,
+    getRandomAdjacent,
   };
 }
 
