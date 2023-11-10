@@ -38,6 +38,10 @@
   background-color: red;
 }
 
+.hitted-cell {
+  background: blue;
+}
+
 /*.player-grid,
 .AI-grid {
   display: grid;
