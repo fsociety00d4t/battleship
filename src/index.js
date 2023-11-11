@@ -7,7 +7,6 @@ const container = document.querySelector(".grids");
 const playerGridDOM = document.querySelector(".player-grid");
 const AIGridDOM = document.querySelector(".AI-grid");
 let Player = player();
-//let AI = player();
 let playerGrid = gameBoard();
 let AIGrid = gameBoard();
 
@@ -103,6 +102,7 @@ function createAIShips() {
 }
 
 function renderGrids() {
+  //PLAYER GRID
   for (let x = 9; x >= 0; x--) {
     let playerCell = document.createElement("div");
 
@@ -114,6 +114,7 @@ function renderGrids() {
     }
   }
 
+  //AI GRID
   for (let x = 9; x >= 0; x--) {
     let AICell = document.createElement("div");
 
@@ -147,114 +148,111 @@ function RenderGridsAfterChange() {
     }
   });
 }
-
-function takeTurns() {
-  let current = Player.getTurn();
-  //while (!gameOver) {
-
-  while (Player.getTurn() === current) {
-    if (current === "player") {
-      // let x = prompt();
-      // let y = x.split(",");
-      //  makeAIBoardAvailable();
-      // AIGrid.receiveAttack(y[0], y[1]);
-      // AIGrid.receiveAttack(4, 5);
-      //   Player.playerTurn(AIGrid, 5, 5);
+function playerAttacks(e) {
+  if (!isGameOver()) {
+    let retValue;
+    if (Player.getTurn() === "player") {
+      let coords = e.id.split(",");
+      retValue = Player.playerTurn(
+        AIGrid,
+        Number(coords[0]),
+        Number(coords[1])
+      );
+      if (retValue === "hit") {
+        let [...arr] = AIGrid.getHit();
+        [...arr].forEach((el) => {
+          if (el[0] === Number(coords[0]) && el[1] === Number(coords[1])) {
+            e.classList.add("hitted-cell");
+            e.classList.add("disabled-cell");
+          }
+        });
+      } else {
+        e.classList.add("missed-cell");
+        e.classList.add("disabled-cell");
+        AIAttacks();
+      }
     }
   }
-  // }
-}
-
-function playerAttacks(e) {
-  console.log("no player");
-  if (Player.getTurn() === "player") {
-    let coords = e.id.split(",");
-    if (Player.playerTurn(AIGrid, Number(coords[0]), Number(coords[1]))) {
-      let [...arr] = AIGrid.getHit();
-      [...arr].forEach((el) => {
-        if (el[0] === Number(coords[0]) && el[1] === Number(coords[1])) {
-          e.classList.add("hitted-cell");
-        }
-      });
-    } else AIAttacks();
-  } //else AIAttacks();
 }
 
 function AIAttacks(e) {
-  console.log(`e is ${e}`);
-  let res;
-  if (Player.getTurn() === "AI") {
-    if (e === undefined) {
-      res = Player.AITurn(playerGrid);
-    } else {
-      res = Player.AITurn(playerGrid, e[0], e[1]);
-    }
-    //TEMP CODE
-    if (res[1] === "AlreadyPlayed") {
-      let PlayerNodes = playerGridDOM.childNodes;
-      [...PlayerNodes].forEach((e) => {
-        let arr = e.id.split(",");
-        if (res[0][0] === Number(arr[0]) && res[0][1] === Number(arr[1])) {
-          console.log("yellow");
-          setTimeout(() => {
-            e.style.backgroundColor = "yellow";
-          }, 0);
-          // e.style.backgroundColor = "yellow";
-        }
-      });
-      AIAttacks();
-    } else if (res[1] === "missed") {
-      let PlayerNodes = playerGridDOM.childNodes;
-      [...PlayerNodes].forEach((e) => {
-        let arr = e.id.split(",");
-        if (res[0][0] === Number(arr[0]) && res[0][1] === Number(arr[1])) {
-          console.log("pink");
-          setTimeout(() => {
-            e.style.backgroundColor = "pink";
-          }, 0);
-          //e.style.backgroundColor = "pink";
-        }
-      });
-    } else if (res[1] === "hit") {
-      let [getRandom] = Player.getRandomAdjacent(
-        res[0][0],
-        res[0][1],
-        playerGrid
-      );
-      let PlayerNodes = playerGridDOM.childNodes;
-      [...PlayerNodes].forEach((e) => {
-        let arr = e.id.split(",");
+  if (!isGameOver()) {
+    console.log(`from AI it is ${isGameOver()}`);
+    let res;
+    if (Player.getTurn() === "AI") {
+      //if function was not called with args play with random values
+      //else find a new random value
+      if (e === undefined) {
+        res = Player.AITurn(playerGrid);
+      } else {
+        res = Player.AITurn(playerGrid, e[0], e[1]);
+      }
+      if (res[1] === "AlreadyPlayed") {
+        AIAttacks();
+      } else if (res[1] === "missed") {
+        let PlayerNodes = playerGridDOM.childNodes;
+        [...PlayerNodes].forEach((e) => {
+          let arr = e.id.split(",");
+          if (res[0][0] === Number(arr[0]) && res[0][1] === Number(arr[1])) {
+            setTimeout(() => {
+              e.classList.add("missed-cell");
+            }, 1000);
+          }
+        });
+      } else if (res[1] === "hit") {
+        let [getRandom] = Player.getRandomAdjacent(
+          res[0][0],
+          res[0][1],
+          playerGrid
+        );
+        let PlayerNodes = playerGridDOM.childNodes;
+        [...PlayerNodes].forEach((e) => {
+          let arr = e.id.split(",");
 
-        if (Number(arr[0]) === res[0][0] && Number(arr[1]) === res[0][1]) {
-          setTimeout(() => {
-            e.classList.add("hitted-cell");
-          }, 0);
-        }
-      });
-      console.log(`GET RANDOM IS ${getRandom}`);
-      AIAttacks(getRandom);
+          if (Number(arr[0]) === res[0][0] && Number(arr[1]) === res[0][1]) {
+            setTimeout(() => {
+              e.classList.add("hitted-cell");
+            }, 0);
+          }
+        });
+        AIAttacks(getRandom);
+      }
     }
   }
 }
 
-function gameOver() {}
+const isGameOver = () => {
+  if (AIGrid.areAllSunk() || playerGrid.areAllSunk()) {
+    declareWinner();
+    const restartBtn = document.querySelector(".restart");
+    restartBtn.classList.add("visible");
+    return true;
+  }
+};
+
+function declareWinner() {
+  const winnerTxt = document.querySelector(".winner");
+  if (!playerGrid.areAllSunk()) winnerTxt.innerText = "You Won";
+  else winnerTxt.innerText = "AI Won";
+}
+
+function restart() {
+  init();
+}
 
 let AInodes = AIGridDOM.childNodes;
 [...AInodes].forEach((e, i) => {
   e.addEventListener("click", function () {
     playerAttacks(e);
+    if (isGameOver()) declareWinner();
   });
 });
-/*let PlayerNodes = playerGridDOM.childNodes;
-[...PlayerNodes].forEach((e, i) => {
-  e.addEventListener("click", function () {
-    AIAttacks(e);
-  });
-}); */
+
+const restartBtn = document.querySelector(".restart");
+restartBtn.addEventListener("click", restart);
 
 function init() {
   renderGrids();
   createAIShips();
   RenderGridsAfterChange();
-  //takeTurns();
 }

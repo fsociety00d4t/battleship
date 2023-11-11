@@ -34,12 +34,30 @@
   text-align: center;
 }
 
+.AI-grid-item {
+  cursor: pointer;
+}
+
 .has-ship {
   background-color: red;
 }
 
 .hitted-cell {
   background: blue;
+}
+.missed-cell {
+  background: pink;
+}
+
+.disabled-cell {
+  cursor: auto;
+}
+.restart {
+  display: none;
+}
+
+.visible {
+  display: block;
 }
 
 /*.player-grid,

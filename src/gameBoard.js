@@ -32,7 +32,6 @@ function gameBoard() {
       if (cells.some((e, i) => e[0] === el[0] && e[1] === el[1])) flag = true;
     });
 
-    console.log(flag);
     return (
       flag === false &&
       (ship.direction === "horizontal"
@@ -42,9 +41,7 @@ function gameBoard() {
   };
 
   const placeShip = (ship, x, y) => {
-    // console.log(`from board ${x} ${y}`);
     if (isValid(ship, x, y)) {
-      //  console.log("valid");
       place(ship, x, y);
       return true;
     } else {
@@ -53,15 +50,11 @@ function gameBoard() {
   };
 
   const receiveAttack = (x, y) => {
-    // console.log("in receiveAttack gameboard");
-    //console.log(`in attack x is ${x} and y is ${y}`);
     let [...arr] = getOccupiedCells();
     let test = arr.find((e, i) => e[1] === x && e[2] === y);
     if (test != undefined) {
-      //  console.log(hit);
       if (hit.find((e, i) => e[0] === x && e[1] === y) === undefined) {
         hit.push([x, y]);
-        //cells.push([x, y]);
       }
       return true;
     } else {
@@ -97,10 +90,7 @@ function gameBoard() {
   return {
     placeShip,
     receiveAttack,
-    missed,
     areAllSunk,
-    occupiedCoords,
-    cells,
     getCells,
     getOccupiedCells,
     getHit,
