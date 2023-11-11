@@ -50,6 +50,8 @@ function gameBoard() {
   };
 
   const receiveAttack = (x, y) => {
+    console.log("occupied are:");
+    console.log(getMissed());
     let [...arr] = getOccupiedCells();
     let test = arr.find((e, i) => e[1] === x && e[2] === y);
     if (test != undefined) {

@@ -6,10 +6,15 @@ import { player } from "../src/player";
 const container = document.querySelector(".grids");
 const playerGridDOM = document.querySelector(".player-grid");
 const AIGridDOM = document.querySelector(".AI-grid");
-let Player = player();
-let playerGrid = gameBoard();
-let AIGrid = gameBoard();
+let Player;
+let playerGrid;
+let AIGrid;
 
+function createPlayerAndGrids() {
+  Player = player();
+  playerGrid = gameBoard();
+  AIGrid = gameBoard();
+}
 //renderGrids();
 /*
 if (length === 5) return "carrier";
@@ -21,16 +26,19 @@ if (length === 5) return "carrier";
 //temp predetermined coordinates
 //player
 //create ships
-let battleship = ship(4, "horizontal");
-let cruiser = ship(3, "vertical");
-let submarine = ship(3, "horizontal");
-let patrol = ship(2, "vertical");
-//place ships
-playerGrid.placeShip(battleship, 1, 0);
-playerGrid.placeShip(cruiser, 3, 5);
-playerGrid.placeShip(submarine, 4, 8);
-playerGrid.placeShip(patrol, 7, 6);
 
+function createPlayerShips() {
+  let battleship = ship(4, "horizontal");
+  let cruiser = ship(3, "vertical");
+  let submarine = ship(3, "horizontal");
+  let patrol = ship(2, "vertical");
+  //place ships
+  playerGrid.placeShip(battleship, 1, 0);
+  playerGrid.placeShip(cruiser, 3, 5);
+  playerGrid.placeShip(submarine, 4, 8);
+  playerGrid.placeShip(patrol, 7, 6);
+}
+renderGrids();
 init();
 
 //AI
@@ -237,8 +245,40 @@ function declareWinner() {
 }
 
 function restart() {
+  removeOldClasses();
+  removeMessage();
   init();
 }
+
+//restart functions
+
+const removeOldClasses = () => {
+  const Pcells = window.document.querySelectorAll(".player-grid-item");
+  const AIcells = window.document.querySelectorAll(".AI-grid-item");
+  Pcells.forEach((e) => {
+    e.classList.remove(
+      "has-ship",
+      "hitted-cell",
+      "missed-cell",
+      "disabled-cell"
+    );
+  });
+  AIcells.forEach((e) => {
+    e.classList.remove(
+      "has-ship",
+      "hitted-cell",
+      "missed-cell",
+      "disabled-cell"
+    );
+  });
+};
+
+const removeMessage = () => {
+  const winner = document.querySelector(".winner");
+  const restartBtn = document.querySelector(".restart");
+  restartBtn.classList.remove("visible");
+  winner.innerText = "";
+};
 
 let AInodes = AIGridDOM.childNodes;
 [...AInodes].forEach((e, i) => {
@@ -252,7 +292,8 @@ const restartBtn = document.querySelector(".restart");
 restartBtn.addEventListener("click", restart);
 
 function init() {
-  renderGrids();
+  createPlayerAndGrids();
+  createPlayerShips();
   createAIShips();
   RenderGridsAfterChange();
 }
