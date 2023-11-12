@@ -1,12 +1,4 @@
-function ship(length, direction) {
-  let typeOfShip = () => {
-    if (length === 5) return "carrier";
-    if (length === 4) return "battleship";
-    if (length === 3) return "cruiser";
-    if (length === 3) return "submarine"; //come back here
-    if (length === 2) return "patrol boat";
-  };
-
+function ship(length, direction, name) {
   let hits = 0;
   const getHits = () => hits;
 
@@ -14,12 +6,9 @@ function ship(length, direction) {
     hits++;
   };
 
-  const isSunk = () => {
-    if (hits >= length) return true;
-    else return false;
-  };
+  const isSunk = () => hits >= length;
 
-  return { length, hits, direction, typeOfShip, getHits, increaseHit, isSunk };
+  return { length, hits, direction, name, getHits, increaseHit, isSunk };
 }
 
 export { ship };

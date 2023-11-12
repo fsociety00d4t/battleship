@@ -15,23 +15,12 @@ function createPlayerAndGrids() {
   playerGrid = gameBoard();
   AIGrid = gameBoard();
 }
-//renderGrids();
-/*
-if (length === 5) return "carrier";
-    if (length === 4) return "battleship";
-    if (length === 3) return "cruiser";
-    if (length === 3) return "submarine"; //come back here
-    if (length === 2) return "patrol boat";
-    */
-//temp predetermined coordinates
-//player
-//create ships
 
 function createPlayerShips() {
-  let battleship = ship(4, "horizontal");
-  let cruiser = ship(3, "vertical");
-  let submarine = ship(3, "horizontal");
-  let patrol = ship(2, "vertical");
+  let battleship = ship(4, "horizontal", "battleship");
+  let cruiser = ship(3, "vertical", "cruiser");
+  let submarine = ship(3, "horizontal", "submarine");
+  let patrol = ship(2, "vertical", "patrol");
   //place ships
   playerGrid.placeShip(battleship, 1, 0);
   playerGrid.placeShip(cruiser, 3, 5);
@@ -47,17 +36,24 @@ function createAIShips() {
   let direction = ["horizontal", "vertical"];
   let battleship = ship(
     4,
-    direction[Math.floor(Math.random() * direction.length)]
+    direction[Math.floor(Math.random() * direction.length)],
+    "battleship"
   );
   let cruiser = ship(
     3,
-    direction[Math.floor(Math.random() * direction.length)]
+    direction[Math.floor(Math.random() * direction.length)],
+    "cruiser"
   );
   let submarine = ship(
     3,
-    direction[Math.floor(Math.random() * direction.length)]
+    direction[Math.floor(Math.random() * direction.length)],
+    "submarine"
   );
-  let patrol = ship(2, direction[Math.floor(Math.random() * direction.length)]);
+  let patrol = ship(
+    2,
+    direction[Math.floor(Math.random() * direction.length)],
+    "patrol"
+  );
 
   console.log(battleship);
   console.log(cruiser);
@@ -139,7 +135,6 @@ function RenderGridsAfterChange() {
   //PLAYER
   const Pcells = window.document.querySelectorAll(".player-grid-item");
   let shipsCords = playerGrid.getCells();
-  console.log("it is " + AIGrid.getOccupiedCells());
   Pcells.forEach((el, i) => {
     if (shipsCords.some((e) => e.toString() === el.id)) {
       el.classList.add("has-ship");
@@ -174,6 +169,7 @@ function playerAttacks(e) {
             e.classList.add("disabled-cell");
           }
         });
+        displayShipsHealth("ai");
       } else {
         e.classList.add("missed-cell");
         e.classList.add("disabled-cell");
@@ -185,7 +181,6 @@ function playerAttacks(e) {
 
 function AIAttacks(e) {
   if (!isGameOver()) {
-    console.log(`from AI it is ${isGameOver()}`);
     let res;
     if (Player.getTurn() === "AI") {
       //if function was not called with args play with random values
@@ -223,11 +218,72 @@ function AIAttacks(e) {
             }, 0);
           }
         });
+        displayShipsHealth("player");
         AIAttacks(getRandom);
       }
     }
   }
 }
+
+function displayShipsHealth(player) {
+  if (player === "ai") {
+    AIGrid.getOccupiedCells().forEach((e) => {
+      if (e[0].isSunk()) {
+        changeColorOnCells(e, player);
+        deleteShipDisplay(e, player);
+      }
+    });
+  } else {
+    playerGrid.getOccupiedCells().forEach((e) => {
+      if (e[0].isSunk()) {
+        changeColorOnCells(e, player);
+        deleteShipDisplay(e, player);
+      }
+    });
+  }
+}
+
+const changeColorOnCells = (e, player) => {
+  const PlayerCells = window.document.querySelectorAll(".player-grid-item"); //HERE DO THE SAME FOR AI
+  const AIcells = window.document.querySelectorAll(".AI-grid-item");
+  if (player === "ai") {
+    AIcells.forEach((el) => {
+      if (!el.classList.contains("sunk") && el.classList.contains("has-ship")) {
+        let x = el.id.split(",");
+        if (Number(x[0]) === e[1] && Number(x[1]) === e[2]) {
+          el.classList.add("sunk");
+        }
+      }
+    });
+  } else {
+    PlayerCells.forEach((el) => {
+      if (!el.classList.contains("sunk") && el.classList.contains("has-ship")) {
+        let x = el.id.split(",");
+        if (Number(x[0]) === e[1] && Number(x[1]) === e[2]) {
+          el.classList.add("sunk");
+        }
+      }
+    });
+  }
+};
+
+const deleteShipDisplay = (e, player) => {
+  const AIShips = document.querySelectorAll(".ai-ships");
+  const PlayerShips = document.querySelectorAll(".player-ships");
+  if (player === "ai") {
+    AIShips.forEach((el) => {
+      if (el.innerText === e[0].name) {
+        el.classList.add("lineOver");
+      }
+    });
+  } else {
+    PlayerShips.forEach((el) => {
+      if (el.innerText === e[0].name) {
+        el.classList.add("lineOver");
+      }
+    });
+  }
+};
 
 const isGameOver = () => {
   if (AIGrid.areAllSunk() || playerGrid.areAllSunk()) {
@@ -295,5 +351,13 @@ function init() {
   createPlayerAndGrids();
   createPlayerShips();
   createAIShips();
+  //displayShipsHealth();
   RenderGridsAfterChange();
 }
+
+/* TODO
+LET PLAYER PLACE THE SHIPS ON THE BOARD
+FIX WAITING FOR RESPONSE BEFORE PLAYING AGAIN
+FINISH THE UI
+REDU THE TESTS 
+*/

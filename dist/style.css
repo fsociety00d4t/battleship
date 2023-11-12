@@ -5,16 +5,23 @@
 
 .grids {
   display: flex;
+  flex-wrap: wrap;
   position: absolute;
   justify-content: center;
-  align-items: center;
   top: 70%;
   left: 50%;
   transform: translate(-50%, -50%);
   border: 2px solid black;
-  height: 80%;
   width: 80%;
-  padding: (5%, 10%);
+  height: 80%;
+}
+
+.grids > div {
+  flex: 1 0 0%;
+}
+
+.grids > div:first-child {
+  flex: 0 1 100%;
 }
 
 .player-grid,
@@ -22,10 +29,10 @@
   margin: 5%;
   border: 2px solid black;
   width: 50%;
-  height: 50%;
   display: grid;
   grid-template-rows: repeat(10, 1fr);
   grid-template-columns: repeat(10, 1fr);
+  max-height: 100%;
 }
 
 .player-grid-item,
@@ -47,6 +54,14 @@
 }
 .missed-cell {
   background: pink;
+}
+
+.sunk {
+  background-color: black;
+}
+
+.lineOver {
+  text-decoration: line-through;
 }
 
 .disabled-cell {
@@ -78,40 +93,19 @@
   top: 20%;
   transform: translate(-50%, -50%);
   align-items: center;
+  justify-items: center;
   gap: 7px;
 }
 
 .ships {
-  position: absolute;
+  width: 100%;
+  background-color: red;
   align-self: flex-start;
-  align-content: flex-end;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
-/*.AI-ships-div {
-  position: absolute;
-  top: 50%;
-  align-self: left;
+.ships > * {
+  margin: 1% 2%;
 }
-
-/*.players-ships-div {
-  position: absolute;
-  align-self: right;
-} */
-
-/*.player-grid,
-.AI-grid {
-  display: grid;
-  height: 80%;
-  width: 80%;
-  position: absolute;
-  top: 50%;
-  left: 10%;
-  transform: translate(-50%, -50%);
-  margin: 2%, 5%;
-  padding: 2px;
-  border: 2px solid black;
-}
-
-.AI-grid {
-  left: 80%;
-} */
