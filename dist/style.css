@@ -32,7 +32,7 @@
   display: grid;
   grid-template-rows: repeat(10, 1fr);
   grid-template-columns: repeat(10, 1fr);
-  max-height: 100%;
+  max-height: 50%;
 }
 
 .player-grid-item,
@@ -67,11 +67,18 @@
 .disabled-cell {
   cursor: auto;
 }
+
+.place-ship-hover {
+  background-color: red;
+}
+
+.placed-ship {
+  background-color: brown;
+}
 .restart {
   display: none;
   cursor: pointer;
   border-radius: 10%;
-  width: 10%;
   height: 15%;
 }
 
@@ -106,6 +113,51 @@
   justify-content: space-around;
 }
 
-.ships > * {
-  margin: 1% 2%;
+.ships > * > * {
+  color: yellow;
+}
+
+.placing-grid-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  position: absolute;
+  justify-content: space-around;
+  align-items: center;
+  align-content: center;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid black;
+  min-width: 80%;
+  min-height: 80%;
+  background-color: aqua;
+  z-index: 1;
+}
+
+.start-grid {
+  border: 2px solid black;
+  display: grid;
+  grid-template-rows: repeat(10, 1fr);
+  grid-template-columns: repeat(10, 1fr);
+}
+
+.placing-cells-item {
+  border: 1px solid black;
+  text-align: center;
+}
+
+.placing-grid-container h3 {
+  font-size: 2em;
+}
+
+.placing-grid-container button {
+  margin: 15px;
+  padding: 10px;
+  border-radius: 5%;
+  cursor: pointer;
+}
+
+.placing-grid-container button:hover {
+  background-color: red;
 }

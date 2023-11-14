@@ -2,6 +2,12 @@ import { ship } from "../src/ship";
 import { gameBoard } from "../src/gameBoard";
 import { player } from "../src/player";
 
+let axis = "x";
+let counter = 0;
+
+const getShipLength = () => {
+  return counter === 0 ? 4 : counter === 1 ? 3 : counter === 2 ? 3 : 2;
+};
 //create boards
 const container = document.querySelector(".grids");
 const playerGridDOM = document.querySelector(".player-grid");
@@ -16,19 +22,58 @@ function createPlayerAndGrids() {
   AIGrid = gameBoard();
 }
 
-function createPlayerShips() {
-  let battleship = ship(4, "horizontal", "battleship");
+function createPlacingGrid() {
+  const placeGrid = document.querySelector(".placing-grid-container");
+  const grid = document.querySelector(".start-grid");
+  for (let x = 9; x >= 0; x--) {
+    let cell = document.createElement("div");
+
+    for (let y = 0; y < 10; y++) {
+      let cell = document.createElement("div");
+      grid.appendChild(cell).className = "placing-cells-item";
+      cell.innerText = `${y},${x}`;
+      cell.id = `${y},${x}`;
+    }
+  }
+}
+
+function createPlayerShips(cell) {
+  let coords = cell.id.split(",");
+  let ax = axis === "x" ? "horizontal" : "vertical";
+  switch (counter) {
+    case 1:
+      let battleship = ship(4, ax, "battleship");
+      playerGrid.placeShip(battleship, Number(coords[0]), Number(coords[1]));
+      break;
+    case 2:
+      let cruiser = ship(3, ax, "cruiser");
+      playerGrid.placeShip(cruiser, Number(coords[0]), Number(coords[1]));
+      break;
+    case 3:
+      let submarine = ship(3, ax, "submarine");
+      playerGrid.placeShip(submarine, Number(coords[0]), Number(coords[1]));
+      break;
+    case 4:
+      let patrol = ship(2, ax, "patrol");
+      playerGrid.placeShip(patrol, Number(coords[0]), Number(coords[1]));
+      break;
+  }
+
+  /* let battleship = ship(4, "horizontal", "battleship");
   let cruiser = ship(3, "vertical", "cruiser");
   let submarine = ship(3, "horizontal", "submarine");
   let patrol = ship(2, "vertical", "patrol");
   //place ships
-  playerGrid.placeShip(battleship, 1, 0);
+  playerGrid.placeShip(battleship, Number(coords[0]), Number(coords[1]));
   playerGrid.placeShip(cruiser, 3, 5);
   playerGrid.placeShip(submarine, 4, 8);
-  playerGrid.placeShip(patrol, 7, 6);
+  playerGrid.placeShip(patrol, 7, 6); */
 }
+
+//init();
+createPlacingGrid();
+createPlayerAndGrids();
 renderGrids();
-init();
 
 //AI
 //create Random Ships
@@ -54,11 +99,6 @@ function createAIShips() {
     direction[Math.floor(Math.random() * direction.length)],
     "patrol"
   );
-
-  console.log(battleship);
-  console.log(cruiser);
-  console.log(submarine);
-  console.log(patrol);
 
   //place ships
   let count = 0;
@@ -301,9 +341,15 @@ function declareWinner() {
 }
 
 function restart() {
+  // RenderGridsAfterChange();
   removeOldClasses();
   removeMessage();
-  init();
+  // init();
+  createPlayerAndGrids();
+  counter = 0;
+  removeOldPlacingShips();
+  const container = document.querySelector(".placing-grid-container");
+  container.style.display = "flex";
 }
 
 //restart functions
@@ -316,7 +362,8 @@ const removeOldClasses = () => {
       "has-ship",
       "hitted-cell",
       "missed-cell",
-      "disabled-cell"
+      "disabled-cell",
+      "sunk"
     );
   });
   AIcells.forEach((e) => {
@@ -324,8 +371,19 @@ const removeOldClasses = () => {
       "has-ship",
       "hitted-cell",
       "missed-cell",
-      "disabled-cell"
+      "disabled-cell",
+      "sunk"
     );
+  });
+
+  const shipsInfo = document.querySelector(".ships").children;
+  let playerShipsInfo = shipsInfo[0].children;
+  let AIShipsInfo = shipsInfo[1].children;
+  [...playerShipsInfo].forEach((e) => {
+    e.classList.remove("lineOver");
+  });
+  [...AIShipsInfo].forEach((e) => {
+    e.classList.remove("lineOver");
   });
 };
 
@@ -344,12 +402,128 @@ let AInodes = AIGridDOM.childNodes;
   });
 });
 
+const cells = window.document.querySelector(".start-grid").childNodes;
+[...cells].forEach((e, i) => {
+  e.addEventListener("mouseenter", function () {
+    if (counter < 4) handlePlacement(e, i);
+  });
+  e.addEventListener("mouseleave", function () {
+    if (counter < 4) removeOld(e, i);
+  });
+  e.addEventListener("click", function () {
+    if (
+      e.classList.contains("place-ship-hover") &&
+      counter < 4 &&
+      !e.classList.contains("placed-ship")
+    ) {
+      counter++;
+      createPlayerShips(e);
+      renderTheShip(e, i);
+    }
+  });
+});
+
+function handlePlacement(e, index) {
+  let test = e.id.split(",");
+  let length = getShipLength();
+  let flag = true;
+  if (axis === "x") {
+    for (let i = 0; i < length; i++) {
+      if (cells[index + i]) {
+        if (cells[index + i].classList.contains("placed-ship")) {
+          flag = false;
+          break;
+        }
+      }
+    }
+    if (flag) {
+      if (Number(test[0]) + length - 1 <= 9) {
+        for (let i = 0; i < length; i++) {
+          cells[index + i].classList.add("place-ship-hover");
+        }
+      }
+    }
+  } else {
+    for (let i = 0; i < length; i++) {
+      if (cells[index - i * 10]) {
+        if (cells[index - i * 10].classList.contains("placed-ship")) {
+          flag = false;
+          break;
+        }
+      }
+    }
+    if (flag) {
+      if (Number(test[1]) + length - 1 <= 9) {
+        for (let i = 0; i < length; i++) {
+          cells[index - i * 10].classList.add("place-ship-hover");
+        }
+      }
+    }
+  }
+}
+
+function removeOld(e, index) {
+  let test = e.id.split(",");
+  let length = getShipLength();
+  if (axis === "x") {
+    if (Number(test[0]) + length - 1 <= 9) {
+      for (let i = 0; i < length; i++) {
+        cells[index + i].classList.remove("place-ship-hover");
+      }
+    }
+  } else {
+    if (Number(test[1]) + length - 1 <= 9) {
+      for (let i = 0; i < length; i++) {
+        cells[index - i * 10].classList.remove("place-ship-hover");
+      }
+    }
+  }
+}
+
+function renderTheShip(e, index) {
+  console.log(axis);
+  cells.forEach((e) => {
+    // console.log(`in renderTheship`);
+    if (e.classList.contains("place-ship-hover")) {
+      //  console.log(`in rendertheship if`);
+      e.classList.add("placed-ship");
+    }
+  });
+}
+
+function removeOldPlacingShips() {
+  cells.forEach((e) => {
+    if (e.classList.contains("placed-ship")) e.classList.remove("placed-ship");
+    if (e.classList.contains("place-ship-hover"))
+      e.classList.remove("place-ship-hover");
+  });
+}
 const restartBtn = document.querySelector(".restart");
 restartBtn.addEventListener("click", restart);
 
+const XAxis = document.querySelector(".x");
+const YAxis = document.querySelector(".y");
+XAxis.addEventListener("click", function () {
+  axis = "x";
+});
+YAxis.addEventListener("click", function () {
+  axis = "y";
+});
+
+const resetBtn = document.querySelector(".reset");
+const placeBtn = document.querySelector(".place");
+placeBtn.addEventListener("click", function () {
+  console.log(counter);
+  if (counter >= 4) {
+    const container = document.querySelector(".placing-grid-container");
+    container.style.display = "none";
+    init();
+  }
+});
 function init() {
-  createPlayerAndGrids();
-  createPlayerShips();
+  // createPlacingGrid();
+  // createPlayerAndGrids();
+  // createPlayerShips();
   createAIShips();
   //displayShipsHealth();
   RenderGridsAfterChange();
