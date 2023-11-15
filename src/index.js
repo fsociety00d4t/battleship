@@ -1,3 +1,5 @@
+import "../dist/style.css";
+
 import { ship } from "../src/ship";
 import { gameBoard } from "../src/gameBoard";
 import { player } from "../src/player";
