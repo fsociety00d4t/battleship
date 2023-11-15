@@ -33,7 +33,7 @@ describe("determine attack", () => {
 
   test("attacking an empty cell", () => {
     game.receiveAttack(9, 0);
-    expect(game.missed).toContainEqual([9, 0]);
+    expect(game.getMissed()).toContainEqual([9, 0]);
   });
 
   test("dont increase hit if the cells has already been attacked", () => {
