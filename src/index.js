@@ -2,6 +2,14 @@ import { ship } from "../src/ship";
 import { gameBoard } from "../src/gameBoard";
 import { player } from "../src/player";
 
+let hitSound = new Audio("../media/hit.mp3");
+let sunkSound = new Audio("../media/sunk.mp3");
+
+const gridContainer = document.querySelector(".grids");
+gridContainer.style.display = "none";
+const msg = document.querySelector(".player-msg");
+msg.innerText = "Your Turn";
+
 let axis = "x";
 let counter = 0;
 
@@ -9,7 +17,6 @@ const getShipLength = () => {
   return counter === 0 ? 4 : counter === 1 ? 3 : counter === 2 ? 3 : 2;
 };
 //create boards
-const container = document.querySelector(".grids");
 const playerGridDOM = document.querySelector(".player-grid");
 const AIGridDOM = document.querySelector(".AI-grid");
 let Player;
@@ -23,15 +30,12 @@ function createPlayerAndGrids() {
 }
 
 function createPlacingGrid() {
-  const placeGrid = document.querySelector(".placing-grid-container");
   const grid = document.querySelector(".start-grid");
   for (let x = 9; x >= 0; x--) {
-    let cell = document.createElement("div");
-
     for (let y = 0; y < 10; y++) {
       let cell = document.createElement("div");
       grid.appendChild(cell).className = "placing-cells-item";
-      cell.innerText = `${y},${x}`;
+      //   cell.innerText = `${y},${x}`;
       cell.id = `${y},${x}`;
     }
   }
@@ -58,19 +62,8 @@ function createPlayerShips(cell) {
       playerGrid.placeShip(patrol, Number(coords[0]), Number(coords[1]));
       break;
   }
-
-  /* let battleship = ship(4, "horizontal", "battleship");
-  let cruiser = ship(3, "vertical", "cruiser");
-  let submarine = ship(3, "horizontal", "submarine");
-  let patrol = ship(2, "vertical", "patrol");
-  //place ships
-  playerGrid.placeShip(battleship, Number(coords[0]), Number(coords[1]));
-  playerGrid.placeShip(cruiser, 3, 5);
-  playerGrid.placeShip(submarine, 4, 8);
-  playerGrid.placeShip(patrol, 7, 6); */
 }
 
-//init();
 createPlacingGrid();
 createPlayerAndGrids();
 renderGrids();
@@ -148,24 +141,20 @@ function createAIShips() {
 function renderGrids() {
   //PLAYER GRID
   for (let x = 9; x >= 0; x--) {
-    let playerCell = document.createElement("div");
-
     for (let y = 0; y < 10; y++) {
       let playerCell = document.createElement("div");
       playerGridDOM.appendChild(playerCell).className = "player-grid-item";
-      playerCell.innerText = `${y},${x}`;
+      // playerCell.innerText = `${y},${x}`;
       playerCell.id = `${y},${x}`;
     }
   }
 
   //AI GRID
   for (let x = 9; x >= 0; x--) {
-    let AICell = document.createElement("div");
-
     for (let y = 0; y < 10; y++) {
       let AICell = document.createElement("div");
       AIGridDOM.appendChild(AICell).className = "AI-grid-item";
-      AICell.innerText = `${y},${x}`;
+      //  AICell.innerText = `${y},${x}`;
       AICell.id = `${y},${x}`;
     }
   }
@@ -177,7 +166,7 @@ function RenderGridsAfterChange() {
   let shipsCords = playerGrid.getCells();
   Pcells.forEach((el, i) => {
     if (shipsCords.some((e) => e.toString() === el.id)) {
-      el.classList.add("has-ship");
+      el.classList.add("player-has-ship");
     }
   });
 
@@ -187,7 +176,7 @@ function RenderGridsAfterChange() {
   shipsCordsAI.forEach((e) => {});
   AIcells.forEach((el, i) => {
     if (shipsCordsAI.some((e) => e.toString() === el.id)) {
-      el.classList.add("has-ship");
+      el.classList.add("ai-has-ship");
     }
   });
 }
@@ -207,13 +196,20 @@ function playerAttacks(e) {
           if (el[0] === Number(coords[0]) && el[1] === Number(coords[1])) {
             e.classList.add("hitted-cell");
             e.classList.add("disabled-cell");
+            try {
+              hitSound.play();
+            } catch {
+              console.log("ship sunked, hit sound Stopped");
+            }
           }
         });
         displayShipsHealth("ai");
       } else {
         e.classList.add("missed-cell");
         e.classList.add("disabled-cell");
+        Player.changeTurn("ai");
         AIAttacks();
+        msg.innerText = "Computer's turn";
       }
     }
   }
@@ -222,7 +218,7 @@ function playerAttacks(e) {
 function AIAttacks(e) {
   if (!isGameOver()) {
     let res;
-    if (Player.getTurn() === "AI") {
+    if (Player.getTurn() === "ai") {
       //if function was not called with args play with random values
       //else find a new random value
       if (e === undefined) {
@@ -253,15 +249,18 @@ function AIAttacks(e) {
           let arr = e.id.split(",");
 
           if (Number(arr[0]) === res[0][0] && Number(arr[1]) === res[0][1]) {
-            setTimeout(() => {
-              e.classList.add("hitted-cell");
-            }, 0);
+            e.classList.add("hitted-cell");
+            hitSound.play();
           }
         });
         displayShipsHealth("player");
         AIAttacks(getRandom);
       }
     }
+    setTimeout(() => {
+      msg.innerText = "Your Turn";
+      Player.changeTurn("player");
+    }, 2000);
   }
 }
 
@@ -284,23 +283,33 @@ function displayShipsHealth(player) {
 }
 
 const changeColorOnCells = (e, player) => {
-  const PlayerCells = window.document.querySelectorAll(".player-grid-item"); //HERE DO THE SAME FOR AI
+  const PlayerCells = window.document.querySelectorAll(".player-grid-item");
   const AIcells = window.document.querySelectorAll(".AI-grid-item");
   if (player === "ai") {
     AIcells.forEach((el) => {
-      if (!el.classList.contains("sunk") && el.classList.contains("has-ship")) {
+      if (
+        !el.classList.contains("sunk") &&
+        el.classList.contains("ai-has-ship")
+      ) {
         let x = el.id.split(",");
         if (Number(x[0]) === e[1] && Number(x[1]) === e[2]) {
           el.classList.add("sunk");
+          hitSound.pause();
+          sunkSound.play();
         }
       }
     });
   } else {
     PlayerCells.forEach((el) => {
-      if (!el.classList.contains("sunk") && el.classList.contains("has-ship")) {
+      if (
+        !el.classList.contains("sunk") &&
+        el.classList.contains("player-has-ship")
+      ) {
         let x = el.id.split(",");
         if (Number(x[0]) === e[1] && Number(x[1]) === e[2]) {
           el.classList.add("sunk");
+          hitSound.pause();
+          sunkSound.play();
         }
       }
     });
@@ -341,10 +350,9 @@ function declareWinner() {
 }
 
 function restart() {
-  // RenderGridsAfterChange();
+  gridContainer.style.display = "none";
   removeOldClasses();
   removeMessage();
-  // init();
   createPlayerAndGrids();
   counter = 0;
   removeOldPlacingShips();
@@ -359,7 +367,7 @@ const removeOldClasses = () => {
   const AIcells = window.document.querySelectorAll(".AI-grid-item");
   Pcells.forEach((e) => {
     e.classList.remove(
-      "has-ship",
+      "player-has-ship",
       "hitted-cell",
       "missed-cell",
       "disabled-cell",
@@ -368,7 +376,7 @@ const removeOldClasses = () => {
   });
   AIcells.forEach((e) => {
     e.classList.remove(
-      "has-ship",
+      "ai-has-ship",
       "hitted-cell",
       "missed-cell",
       "disabled-cell",
@@ -378,7 +386,7 @@ const removeOldClasses = () => {
 
   const shipsInfo = document.querySelector(".ships").children;
   let playerShipsInfo = shipsInfo[0].children;
-  let AIShipsInfo = shipsInfo[1].children;
+  let AIShipsInfo = shipsInfo[2].children;
   [...playerShipsInfo].forEach((e) => {
     e.classList.remove("lineOver");
   });
@@ -395,9 +403,15 @@ const removeMessage = () => {
 };
 
 let AInodes = AIGridDOM.childNodes;
-[...AInodes].forEach((e, i) => {
+[...AInodes].forEach((e) => {
   e.addEventListener("click", function () {
-    playerAttacks(e);
+    if (
+      Player.getTurn() === "player" &&
+      !e.classList.contains("disabled-cell")
+    ) {
+      playerAttacks(e);
+    }
+
     if (isGameOver()) declareWinner();
   });
 });
@@ -480,12 +494,9 @@ function removeOld(e, index) {
   }
 }
 
-function renderTheShip(e, index) {
-  console.log(axis);
+function renderTheShip() {
   cells.forEach((e) => {
-    // console.log(`in renderTheship`);
     if (e.classList.contains("place-ship-hover")) {
-      //  console.log(`in rendertheship if`);
       e.classList.add("placed-ship");
     }
   });
@@ -505,33 +516,42 @@ const XAxis = document.querySelector(".x");
 const YAxis = document.querySelector(".y");
 XAxis.addEventListener("click", function () {
   axis = "x";
+  XAxis.classList.add("pressed-btn");
+  YAxis.classList.remove("pressed-btn");
 });
 YAxis.addEventListener("click", function () {
   axis = "y";
+  YAxis.classList.add("pressed-btn");
+  XAxis.classList.remove("pressed-btn");
 });
 
 const resetBtn = document.querySelector(".reset");
 const placeBtn = document.querySelector(".place");
 placeBtn.addEventListener("click", function () {
-  console.log(counter);
   if (counter >= 4) {
     const container = document.querySelector(".placing-grid-container");
     container.style.display = "none";
+    gridContainer.style.display = "flex";
     init();
   }
 });
+
+resetBtn.addEventListener("click", function () {
+  cells.forEach((e) => {
+    e.classList.remove("place-ship-hover", "placed-ship");
+  });
+  removeOldClasses();
+  removeMessage();
+  createPlayerAndGrids();
+  counter = 0;
+  removeOldPlacingShips();
+});
 function init() {
-  // createPlacingGrid();
-  // createPlayerAndGrids();
-  // createPlayerShips();
   createAIShips();
-  //displayShipsHealth();
   RenderGridsAfterChange();
 }
 
 /* TODO
-LET PLAYER PLACE THE SHIPS ON THE BOARD
-FIX WAITING FOR RESPONSE BEFORE PLAYING AGAIN
 FINISH THE UI
 REDU THE TESTS 
 */

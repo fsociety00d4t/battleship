@@ -8,7 +8,6 @@ function player() {
   };
 
   const changeTurn = (turn) => {
-    console.log(`from player ${currentTurn}`);
     currentTurn = turn;
   };
 
@@ -18,7 +17,7 @@ function player() {
       return "AlreadyMissed";
     }
     if (!v) {
-      currentTurn = "AI";
+      currentTurn = "ai";
       return "missed";
     }
     if (v) return "hit";
@@ -82,7 +81,7 @@ function player() {
     if (v === undefined) {
       return [values, "AlreadyPlayed"];
     } else if (v !== undefined && v !== true) {
-      currentTurn = "player";
+      // currentTurn = "player";
       return [values, "missed"];
     } else {
       return [values, "hit"];

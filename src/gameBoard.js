@@ -41,10 +41,8 @@ function gameBoard() {
   };
 
   const placeShip = (ship, x, y) => {
-    console.log(ship, x, y);
     if (isValid(ship, x, y)) {
       place(ship, x, y);
-      console.log("valid");
       return true;
     } else {
       return false;
