@@ -1,0 +1,240 @@
+@font-face {
+  font-family: "rapscall-webfont";
+  src: url("../media/rapscall-webfont.woff");
+}
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: black;
+  height: 105vh;
+  min-height: 105vh;
+}
+
+.grids {
+  /* background-color: palevioletred; */
+  display: flex;
+  flex-wrap: wrap;
+  position: absolute;
+  justify-content: center;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid white;
+  width: 80%;
+  height: 80%;
+}
+
+.grids > div {
+  flex: 1 0 0%;
+}
+
+.grids > div:first-child {
+  flex: 0 1 100%;
+}
+
+.player-grid,
+.AI-grid {
+  margin: 5%;
+  border: 2px solid white;
+  display: grid;
+  grid-template-rows: repeat(10, 1fr);
+  grid-template-columns: repeat(10, 1fr);
+  height: 50%;
+  width: 50%;
+}
+
+.player-grid-item,
+.AI-grid-item {
+  border: 1px solid white;
+  text-align: center;
+}
+
+.AI-grid-item {
+  cursor: pointer;
+}
+
+/*.has-ship {
+  background-color: blue;
+} */
+
+.player-has-ship {
+  background-color: blue;
+}
+
+.ai-has-ship {
+  background-color: black;
+}
+
+.hitted-cell {
+  background: rgba(235, 213, 17, 0.918);
+}
+
+.missed-cell {
+  background: green;
+}
+
+.sunk {
+  background-color: red;
+}
+
+.disabled-cell {
+  cursor: auto;
+}
+
+.place-ship-hover {
+  background-color: green;
+}
+
+.placed-ship {
+  background-color: red;
+}
+.restart {
+  display: none;
+  cursor: pointer;
+  padding: 0.5% 1.5%;
+  color: red;
+  background: transparent;
+  border: none;
+  font-size: 1.5em;
+  font-family: monospace;
+}
+
+.restart:hover {
+  transform: scale(1.5);
+  transition: all 0.3s ease-in-out 0.1s;
+}
+
+.visible {
+  display: block;
+}
+
+.info {
+  margin-top: 50px;
+  display: flex;
+  width: 50%;
+  flex-direction: column;
+  position: absolute;
+  left: 50%;
+  top: 5%;
+  transform: translate(-50%, -50%);
+  align-items: center;
+  justify-items: center;
+  gap: 7px;
+}
+
+.ships {
+  margin-top: 2%;
+  width: 100%;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.ships > *:not(:nth-child(2)) {
+  border: 1px solid white;
+  border-radius: 5%;
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+}
+
+.ships > * > * {
+  color: white;
+  margin-top: 5%;
+}
+
+.placing-grid-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  position: absolute;
+  justify-content: space-around;
+  align-items: center;
+  align-content: center;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid black;
+  min-width: 50%;
+  min-height: 50%;
+  z-index: 1;
+  background-color: black;
+  border: 1px solid white;
+}
+
+.start-grid {
+  border: 2px solid white;
+  display: grid;
+  grid-template-rows: repeat(10, 30px);
+  grid-template-columns: repeat(10, 30px);
+}
+
+.placing-cells-item {
+  border: 1px solid white;
+}
+
+.placing-grid-container h3 {
+  font-size: 2em;
+}
+
+.placing-grid-container button {
+  margin: 15px;
+  padding: 10px;
+  border-radius: 5%;
+  cursor: pointer;
+  color: white;
+  background: black;
+  border: 2px solid white;
+}
+
+.placing-grid-container button:hover {
+  background-color: red;
+}
+
+.no-pointer {
+  pointer-events: none;
+}
+
+h1 {
+  color: red;
+  font-family: "rapscall-webfont";
+  font-size: 5em;
+}
+
+h3 {
+  font-size: 1.3em;
+  color: red;
+  font-family: monospace;
+  letter-spacing: 3px;
+  font-weight: bolder;
+}
+
+.lineOver {
+  color: red;
+  text-decoration: line-through;
+}
+
+.health {
+  font-weight: bolder;
+}
+
+.grids p {
+  margin-top: 50%;
+  margin-bottom: 50%;
+  color: green;
+  font-weight: bolder;
+  border: none;
+  font-size: 1.3em;
+}
+
+.pressed-btn {
+  background-color: red !important;
+}
