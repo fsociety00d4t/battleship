@@ -4,8 +4,8 @@ import { ship } from "../src/ship";
 import { gameBoard } from "../src/gameBoard";
 import { player } from "../src/player";
 
-let hitSound = new Audio("../media/hit.mp3");
-let sunkSound = new Audio("../media/sunk.mp3");
+let hitSound = new Audio("./hit.mp3");
+let sunkSound = new Audio("./sunk.mp3");
 
 const gridContainer = document.querySelector(".grids");
 gridContainer.style.display = "none";
