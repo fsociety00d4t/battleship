@@ -553,7 +553,4 @@ function init() {
   RenderGridsAfterChange();
 }
 
-/* TODO
-FINISH THE UI
-REDU THE TESTS 
-*/
+
